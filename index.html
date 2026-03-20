@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متابعة الحفظ</title>
+    <style>
+        :root {
+            --primary-color: #2E7D32; /* لون أخضر أنيق */
+            --secondary-color: #E8F5E9;
+            --text-color: #333;
+            --bg-color: #f4f7f6;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            border-top: 5px solid var(--primary-color);
+        }
+        .card h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        /* تصميم جدول العرض */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        td {
+            font-size: 1.1em;
+        }
+        /* تصميم نموذج الإدخال */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        select, input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 1em;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(46, 125, 50, 0.3);
+        }
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            width: 100%;
+            border-radius: 6px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #1b5e20;
+        }
+        .loader {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+        #message {
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>متابعة الحفظ</h1>
+
+    <div class="container">
+        <div class="card">
+            <h2>أحدث تسجيل</h2>
+            <div id="display-section">
+                <p class="loader">جاري جلب البيانات...</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>تسجيل ورد جديد</h2>
+            <form id="record-form">
+                <div class="form-group">
+                    <label for="name">الاسم:</label>
+                    <select id="name" name="name" required>
+                        <option value="" disabled selected>اختر الاسم</option>
+                        <option value="عبدالله محمد">عبدالله محمد</option>
+                        <option value="عبدالرحمن وائل">عبدالرحمن وائل</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="surah">اسم السورة:</label>
+                    <input type="text" id="surah" name="surah" placeholder="مثال: البقرة" required>
+                </div>
+                <div class="form-group">
+                    <label for="ayah">رقم الآية:</label>
+                    <input type="number" id="ayah" name="ayah" placeholder="مثال: 286" min="1" required>
+                </div>
+                <button type="submit" id="submit-btn">إرسال</button>
+                <div id="message"></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // *** ضع رابط الـ Web App الخاص بك هنا ***
+        const SCRIPT_URL = 'ضع_الرابط_هنا'; 
+
+        // دالة لجلب آخر تسجيل
+        async function fetchLastRecord() {
+            const displaySection = document.getElementById('display-section');
+            if (SCRIPT_URL === 'ضع_الرابط_هنا') {
+                displaySection.innerHTML = '<p style="color:red; text-align:center;">يرجى وضع رابط Google Apps Script في الكود أولاً.</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch(SCRIPT_URL + "?action=getLast");
+                const data = await response.json();
+
+                if(data.status === "success" && data.data) {
+                    const row = data.data;
+                    displaySection.innerHTML = `
+                        <table>
+                            <tr>
+                                <th>التاريخ</th>
+                                <th>الاسم</th>
+                                <th>السورة</th>
+                                <th>الآية</th>
+                            </tr>
+                            <tr>
+                                <td>${row.date}</td>
+                                <td>${row.name}</td>
+                                <td>${row.surah}</td>
+                                <td>${row.ayah}</td>
+                            </tr>
+                        </table>
+                    `;
+                } else {
+                    displaySection.innerHTML = '<p style="text-align:center;">لا توجد بيانات مسجلة حتى الآن.</p>';
+                }
+            } catch (error) {
+                displaySection.innerHTML = '<p style="color:red; text-align:center;">حدث خطأ في جلب البيانات.</p>';
+                console.error('Error:', error);
+            }
+        }
+
+        // إرسال البيانات
+        document.getElementById('record-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            const msg = document.getElementById('message');
+            
+            btn.disabled = true;
+            btn.innerText = 'جاري الإرسال...';
+            msg.innerText = '';
+
+            const formData = new FormData();
+            formData.append('action', 'add');
+            formData.append('name', document.getElementById('name').value);
+            formData.append('surah', document.getElementById('surah').value);
+            formData.append('ayah', document.getElementById('ayah').value);
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+
+                if(result.status === "success") {
+                    msg.style.color = "green";
+                    msg.innerText = "تم تسجيل البيانات بنجاح!";
+                    document.getElementById('record-form').reset();
+                    // تحديث واجهة العرض بآخر ما تم إدخاله
+                    fetchLastRecord();
+                } else {
+                    throw new Error("فشل الحفظ");
+                }
+            } catch (error) {
+                msg.style.color = "red";
+                msg.innerText = "حدث خطأ أثناء الإرسال. تأكد من الاتصال بالإنترنت.";
+                console.error('Error!', error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'إرسال';
+            }
+        });
+
+        // تشغيل دالة الجلب عند فتح الصفحة
+        fetchLastRecord();
+    </script>
+</body>
+</html>
